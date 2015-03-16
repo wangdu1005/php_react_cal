@@ -12,16 +12,19 @@
 
 <?php
 
-$store_op=$_POST['lastOp'];
+$store_op=@$_POST['lastOp'];
+
+// 1.==== This for loop will find out which number or operator has been submit.
+//then push the string with "one space on left side and right side of value" into $currentOp variable
+//these two space around the value are for the output UI, if no space it will be very ugly!!
 
 for ($i=0;$i<18;$i++){
 
-	//$_POST[$i] is the value of the input name.
+	// 2.==== $_POST[$i] is the value of the input name.
 	//SO, if the $i = 13, which means the post get the name="13" value, 
 	//then $_POST[$i] will be "X"
  	
- 	echo "post ".$i.": ".$_POST[$i]."<br>";
-	echo "isset: ".isset($_POST[$i])."<br>";
+ 	echo empty($_POST[$i])?"<br>"."no number":"<br>"."value of name: ".@$_POST[$i]."<br>";
 	
 	if (isset($_POST[$i])){
 		$currentOp=$i;
@@ -49,6 +52,7 @@ for ($i=0;$i<18;$i++){
 			case 16:
 				$currentOp=' % ';
 				$store_op=result_get($store_op);
+				echo "<br>"."The submmit is percentage: ".$store_op."<br>";
 			break;
 			case 17:
 				$currentOp='.';
@@ -57,24 +61,42 @@ for ($i=0;$i<18;$i++){
 		}
 	}
 }
-$store_op.=$currentOp;
 
-echo "store_opx: ".$store_op;
+// 3.==== If the submmit value is "number" not "operator", 
+//then just ".=" store the number into string variable!
+//But no matter what, the for loop still will run 18 times to searching the "operator"!
+
+$store_op.=@$currentOp;
+
+echo "<br>"."store_op: ".$store_op;
+
+// 4.==== This result_get function is to calculate those value.
+// it will explode the store_op string into an "array"
 
 function result_get($store_op){
 
+	// 5.==== Because the for loop for checking operator will insert an " "."x"." " two space around it
+	// so the array will be "12 + 10 - 55", and we using explode to get all nubmer and operator, 
+	// and remove those space
 	$opArray=explode(" ", $store_op);
+	echo "opArray: "."<br>";
 	var_dump($opArray);
 	$total=$opArray[0];
 
 	$numOfOps=count($opArray);
 	echo "<br>"."numOfOps: ".$numOfOps;
 	for ($i=0;$i<$numOfOps;$i++){
+
 		$countMod=$i%2;
 		echo " countMod: ".$countMod;
+
+		// 6.==== without the space the array will be 12+50-601+100 == 0101010
+		// so what if the array become 12++50--610--100?? it will be == 0101010101
 		if ($countMod == 1){
-			//normally people enter number first, then enter the operator
-			//So 0 1 0 1 0 1 0
+			
+			// 7.==== If the $opArray[$i] is operator then the [$i+1] 
+			// will be the number to calculate with previous number result
+			// If!! the [$i+1] still is operator, then just ignore it, and return the total value
 			switch($opArray[$i])
 			{
 				case '+':
@@ -103,6 +125,8 @@ return $total;
 <div id="formStyle">
 	<form method="post" action="index.php" id="formCalc">
 <?php
+// 8.==== The final result will be update into this input textbox value="$store_op"
+// <<<_END XXXXXXXXXX _END is the paragraph expression, it can read the php variable and html tag
 echo <<<_END
 <input type="hidden" value="$store_op" name="lastOp" />
 <input type="textbox" value="$store_op" id="opBox" name="opBox"  /><br>
