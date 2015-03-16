@@ -1,0 +1,13 @@
+.opButtons{
+	height:10%;
+	width:10%;
+	font-size:20pt;
+	text-align:center;
+	vertical-align:middle;
+}
+
+#opBox {
+  width: 30%;
+  height: 33px;
+  font-size: 20pt;
+}
